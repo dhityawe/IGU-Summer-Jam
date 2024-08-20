@@ -8,6 +8,7 @@ public class PlayerMovement : MonoBehaviour
     // Reference to the SpriteRenderer component
     private SpriteRenderer sr;
     private Rigidbody rb;
+
     // Reference to the CharacterBaseSO scriptable object
     public CharacterBaseSO characterBase;
 
@@ -54,4 +55,5 @@ public class PlayerMovement : MonoBehaviour
             sr.flipX = false;
         }
     }
+ 
 }

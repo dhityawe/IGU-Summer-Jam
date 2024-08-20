@@ -2,48 +2,93 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum ItemType
+{
+        Sword,
+        Bow
+}
+
+
+//singleton to the
 public class Items : MonoBehaviour
 {
     public ItemType itemType;
-    private Rigidbody rb;
-    public Transform itemSlotTransform;
+    public GameObject itemSlotParent;
+
+    public float pickUpCooldown = 0.3f;
     
-    public enum ItemType
+    
+
+    private void OnCollisionEnter(Collision collision)
     {
-        Sword = 0,
-        Bow = 1,
+        
+        // Check if the collided object has the "Player" tag
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            // Call the ItemCollide method
+            ItemCollidePlayer();
+
+            Debug.Log("Item Collided");
+        }
+
+        else if (collision.gameObject.CompareTag("Ally"))
+        {
+            // Call the ItemDropped method
+            ItemCollideAlly();
+
+            Debug.Log("Item Equipped by Ally");
+        }
     }
 
-    // public void PickupItem(GameObject itemPickedUp)
-    // {
-    //     // Disable the Collider and Rigidbody of the item
-    //     itemPickedUp.GetComponent<Collider>().enabled = false;
-        
-    //     Rigidbody rb = itemPickedUp.GetComponent<Rigidbody>();
-    //     if (rb != null)
-    //     {
-    //         rb.isKinematic = true; // Stops the Rigidbody from being affected by physics
-    //     }
+    public void ItemCollidePlayer()
+    {
+        // Get the Rigidbody component
+        Rigidbody rb = GetComponent<Rigidbody>();
 
-    //     // Set item properties
-    //     itemPickedUp.GetComponent<Item>().itemType = itemType;
-    //     itemPickedUp.GetComponent<Item>().itemSlotTransform = itemSlotTransform;
-    //     itemPickedUp.GetComponent<Item>().PickupItem();    
+        // Set this item as a child of the itemSlotParent
+        transform.SetParent(itemSlotParent.transform);
 
-    //     // Set the item's parent & position to the item slot
-    //     itemPickedUp.transform.SetParent(itemSlotTransform);
-    //     itemPickedUp.transform.localPosition = Vector3.zero;
+        // Reset the local position to (0, 0, 0)
+        transform.localPosition = Vector3.zero;
 
-    //     switch (itemType)
-    //     {
-    //         case ItemType.Sword:
-    //             Debug.Log("Picked up a sword");
-    //             break;
-    //         case ItemType.Bow:
-    //             Debug.Log("Picked up a bow");
-    //             break;
-    //         default:
-    //             break;
-    //     }
-    // }
+        if (rb != null)
+        {
+            // Disable the Rigidbody component
+            rb.isKinematic = true;
+        }
+
+        // Check if the itemSlotParent has more than 1 child
+        if (itemSlotParent.transform.childCount > 1)
+        {
+            ItemDropped();
+        }
+    }
+
+    public void ItemCollideAlly()
+    {
+        //* Ally Equip Item on collision here
+    }
+
+    public void ItemDropped()
+    {
+        // Get the first child of the itemSlotParent
+        Transform firstChild = itemSlotParent.transform.GetChild(0);
+
+        // Set the y position to 0.8 and z position to player's z position + 1
+        Vector3 newPosition = firstChild.position;
+        newPosition.y = 0.8f;
+        newPosition.z = transform.position.z + 2;
+
+        firstChild.position = newPosition;
+
+        // Enable the Rigidbody component on the first child
+        Rigidbody firstChildRb = firstChild.GetComponent<Rigidbody>();
+        if (firstChildRb != null)
+        {
+            firstChildRb.isKinematic = false;
+        }
+
+            // Detach the first child from the itemSlotParent
+            firstChild.SetParent(null);
+        }
 }

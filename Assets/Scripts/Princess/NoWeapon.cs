@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class NoWeapon : PrincessState
 {
-    private float speed = 2f;
+    private float speed = 5f;
     private float radiusDistance = 3f;
     private Rigidbody princessRb;
     private GameObject player;

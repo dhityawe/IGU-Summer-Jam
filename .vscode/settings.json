@@ -51,5 +51,6 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "IGU-Summer-Jam.sln"
+    "dotnet.defaultSolution": "IGU-Summer-Jam.sln",
+    "dotnet.preferCSharpExtension": true
 }
