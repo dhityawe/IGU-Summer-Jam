@@ -6,7 +6,8 @@ public class PlayerMovement : MonoBehaviour
 {
 
     // Reference to the SpriteRenderer component
-    private SpriteRenderer sR;
+    private SpriteRenderer sr;
+    private Rigidbody rb;
     // Reference to the CharacterBaseSO scriptable object
     public CharacterBaseSO characterBase;
 
@@ -14,7 +15,7 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         // get the sprite renderer component
-        sR = GetComponent<SpriteRenderer>();
+        sr = GetComponent<SpriteRenderer>();
     }
 
     void Update()
@@ -46,11 +47,11 @@ public class PlayerMovement : MonoBehaviour
         // flip the sprite relative to the direction the player is moving
         if (Input.GetAxis("Horizontal") < 0)
         {
-            sR.flipX = true;
+            sr.flipX = true;
         }
         else if (Input.GetAxis("Horizontal") > 0)
         {
-            sR.flipX = false;
+            sr.flipX = false;
         }
     }
 }
