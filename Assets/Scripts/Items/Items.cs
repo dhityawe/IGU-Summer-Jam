@@ -14,36 +14,36 @@ public class Items : MonoBehaviour
         Bow = 1,
     }
 
-    public void PickupItem(GameObject itemPickedUp)
-    {
-        // Disable the Collider and Rigidbody of the item
-        itemPickedUp.GetComponent<Collider>().enabled = false;
+    // public void PickupItem(GameObject itemPickedUp)
+    // {
+    //     // Disable the Collider and Rigidbody of the item
+    //     itemPickedUp.GetComponent<Collider>().enabled = false;
         
-        Rigidbody rb = itemPickedUp.GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            rb.isKinematic = true; // Stops the Rigidbody from being affected by physics
-        }
+    //     Rigidbody rb = itemPickedUp.GetComponent<Rigidbody>();
+    //     if (rb != null)
+    //     {
+    //         rb.isKinematic = true; // Stops the Rigidbody from being affected by physics
+    //     }
 
-        // Set item properties
-        itemPickedUp.GetComponent<Item>().itemType = itemType;
-        itemPickedUp.GetComponent<Item>().itemSlotTransform = itemSlotTransform;
-        itemPickedUp.GetComponent<Item>().PickupItem();    
+    //     // Set item properties
+    //     itemPickedUp.GetComponent<Item>().itemType = itemType;
+    //     itemPickedUp.GetComponent<Item>().itemSlotTransform = itemSlotTransform;
+    //     itemPickedUp.GetComponent<Item>().PickupItem();    
 
-        // Set the item's parent & position to the item slot
-        itemPickedUp.transform.SetParent(itemSlotTransform);
-        itemPickedUp.transform.localPosition = Vector3.zero;
+    //     // Set the item's parent & position to the item slot
+    //     itemPickedUp.transform.SetParent(itemSlotTransform);
+    //     itemPickedUp.transform.localPosition = Vector3.zero;
 
-        switch (itemType)
-        {
-            case ItemType.Sword:
-                Debug.Log("Picked up a sword");
-                break;
-            case ItemType.Bow:
-                Debug.Log("Picked up a bow");
-                break;
-            default:
-                break;
-        }
-    }
+    //     switch (itemType)
+    //     {
+    //         case ItemType.Sword:
+    //             Debug.Log("Picked up a sword");
+    //             break;
+    //         case ItemType.Bow:
+    //             Debug.Log("Picked up a bow");
+    //             break;
+    //         default:
+    //             break;
+    //     }
+    // }
 }
