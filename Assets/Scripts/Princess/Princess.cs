@@ -26,4 +26,14 @@ public class Princess : MonoBehaviour
         currentState = newState;
         currentState?.Enter(this);
     }
+
+    public void MeleeAttack()
+    {
+        
+    }
+
+    public void RangeAttack()
+    {
+
+    }
 }
