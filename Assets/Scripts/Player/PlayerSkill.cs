@@ -150,4 +150,19 @@ public class PlayerSkill : MonoBehaviour
 
         isDashing = false;
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.gameObject.CompareTag("Ally"))
+        {
+            GameObject weapon = itemSlotParent.transform.GetChild(0).gameObject;
+            if(weapon != null)
+            {
+                weapon.transform.SetParent(Princess.instance.gameObject.transform);
+                // set position
+                weapon.transform.localPosition = new Vector3(0, 7, 0);
+            }
+        }
+    }
+
 }

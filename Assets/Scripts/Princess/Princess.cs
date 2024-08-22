@@ -4,9 +4,15 @@ using UnityEngine;
 
 public class Princess : MonoBehaviour
 {
+    public static Princess instance;
     private PrincessState currentState;
     public NoWeapon noWeapon = new();
     public Weapon weapon = new();
+
+    void Awake()
+    {
+        instance = this;
+    }
     // Start is called before the first frame update
     void Start()
     {
