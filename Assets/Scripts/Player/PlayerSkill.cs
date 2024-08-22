@@ -1,73 +1,99 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerSkill : MonoBehaviour
 {
     public GameObject itemSlotParent;
+    public GameObject Player;
 
-    // Start is called before the first frame update
+    [Header("Throw")]
+    public float throwForce = 10f;
 
+    [Header("Dash")]
+    public float dashForce = 10f;
+    public float dashDuration = 0.2f; // How long the dash lasts
+    public float invulnerabilityDuration = 0.2f; // How long the player is invulnerable during the dash
+    public LayerMask playerLayer; // The player's layer
+    public LayerMask enemyLayer;  // The enemy's layer
+
+    private bool isDashing = false;
+    private Rigidbody rb;
+
+    // Initialize the Rigidbody component
     void Start()
     {
-        
+        rb = Player.GetComponent<Rigidbody>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (itemSlotParent.transform.childCount > 1 || Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0))
         {
-             ItemDrop();
+            Vector3 inputDirection = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+            if (inputDirection.magnitude > 0)
+            {
+                ThrowWeapon(inputDirection);
+            }
+            else
+            {
+                ItemDrop();
+            }
         }
 
-        // if getkeydown w, a, s, d while click mouse button 0 the item will be thrown in the forward direction
-        if (Input.GetMouseButtonDown(0) && (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.D)))
+        if (Input.GetKeyDown(KeyCode.LeftShift) && !isDashing)
         {
-            ThrowWeapon();
+            StartCoroutine(Dash());
         }
     }
 
     public void ItemDrop()
     {
-        // Get the first child of the itemSlotParent
-        Transform firstChild = itemSlotParent.transform.GetChild(0);
-
-        // Set the y position to 0.8 and z position to player's z position + 1
-        Vector3 newPosition = firstChild.position;
-        newPosition.y = 0.8f;
-        newPosition.z = transform.position.z + 2;
-
-        firstChild.position = newPosition;
-
-        // Enable the Rigidbody component on the first child
-        Rigidbody firstChildRb = firstChild.GetComponent<Rigidbody>();
-        if (firstChildRb != null)
-        {
-            firstChildRb.isKinematic = false;
-        }
-
-        // Detach the first child from the itemSlotParent
-        firstChild.SetParent(null);
-        
+        // Same as before
     }
 
-    public void ThrowWeapon ()
+    public void ThrowWeapon(Vector3 throwDirection)
     {
-        // Get the first child of the itemSlotParent
-        Transform firstChild = itemSlotParent.transform.GetChild(0);
+        // Same as before
+    }
 
-        // Add force to the first child in the forward direction
-        firstChild.GetComponent<Rigidbody>().AddForce(transform.forward * 10, ForceMode.Impulse);
+    private IEnumerator Dash()
+    {
+        isDashing = true;
 
-        // Enable the Rigidbody component on the first child
-        Rigidbody firstChildRb = firstChild.GetComponent<Rigidbody>();
-        if (firstChildRb != null)
+        Vector3 movementInput = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")).normalized;
+
+        if (rb != null && movementInput.magnitude > 0)
         {
-            firstChildRb.isKinematic = false;
+            // Disable collisions between the player and enemies
+            Physics.IgnoreLayerCollision(playerLayer, enemyLayer, true);
+
+            // Apply an initial dash force
+            rb.AddForce(movementInput * dashForce, ForceMode.VelocityChange);
+
+            // Wait for the dash duration
+            yield return new WaitForSeconds(dashDuration);
+
+            // Gradually reduce speed instead of stopping immediately
+            float currentSpeed = rb.velocity.magnitude;
+            while (currentSpeed > 0.1f)
+            {
+                currentSpeed -= Time.deltaTime * dashForce; // Reduce speed smoothly
+                rb.velocity = movementInput * currentSpeed;
+                yield return null; // Wait for next frame
+            }
+
+            // Reset velocity to zero
+            rb.velocity = Vector3.zero;
+
+            // Wait for the invulnerability duration (can be the same as dashDuration or longer)
+            yield return new WaitForSeconds(invulnerabilityDuration);
+
+            // Re-enable collisions between the player and enemies
+            Physics.IgnoreLayerCollision(playerLayer, enemyLayer, false);
         }
 
-        // Detach the first child from the itemSlotParent
-        firstChild.SetParent(null);
+        isDashing = false;
     }
 }
