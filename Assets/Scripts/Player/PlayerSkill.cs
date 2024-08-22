@@ -50,12 +50,66 @@ public class PlayerSkill : MonoBehaviour
 
     public void ItemDrop()
     {
-        // Same as before
+        // Get the first child of the itemSlotParent
+        Transform firstChild = itemSlotParent.transform.GetChild(0);
+
+        // Set the y position to 0.8 and z position to player's z position + 2
+        Vector3 newPosition = firstChild.position;
+        newPosition.y = 0.8f;
+        newPosition.z = transform.position.z + 2;
+
+        firstChild.position = newPosition;
+
+        // Enable the Rigidbody component on the first child
+        Rigidbody firstChildRb = firstChild.GetComponent<Rigidbody>();
+        if (firstChildRb != null)
+        {
+            firstChildRb.isKinematic = false;
+        }
+
+        // Detach the first child from the itemSlotParent
+        firstChild.SetParent(null);
     }
 
     public void ThrowWeapon(Vector3 throwDirection)
     {
-        // Same as before
+        // Get the first child of the itemSlotParent
+        Transform firstChild = itemSlotParent.transform.GetChild(0);
+
+        // Adjust the initial spawn position to be further away from the player
+        Vector3 newPosition = firstChild.position;
+        newPosition.y = 0.8f;
+
+        // Adjust the z position to be further away based on the throw direction
+        if (throwDirection.z < 0) // Throwing backwards (S direction)
+        {
+            newPosition.z = transform.position.z - 1f;
+        }
+        else
+        {
+            newPosition.z = transform.position.z + 1f;
+        }
+
+        // Optionally, adjust the x position if necessary for diagonal throws
+        newPosition.x += throwDirection.x * 0.5f; // Adjust this multiplier as needed
+
+        firstChild.position = newPosition;
+
+        // Enable the Rigidbody component on the first child
+        Rigidbody firstChildRb = firstChild.GetComponent<Rigidbody>();
+        if (firstChildRb != null)
+        {
+            firstChildRb.isKinematic = false;
+        }
+
+        // Detach the first child from the itemSlotParent
+        firstChild.SetParent(null);
+
+        // Normalize the throw direction to ensure consistent force regardless of direction
+        Vector3 normalizedThrowDirection = throwDirection.normalized;
+
+        // Add force to the first child in the desired direction
+        firstChildRb.AddForce(normalizedThrowDirection * throwForce, ForceMode.Impulse);
     }
 
     private IEnumerator Dash()
