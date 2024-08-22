@@ -5,7 +5,6 @@ public class CharacterBaseSO : ScriptableObject
 {
     [Header("Character Type")]
     public bool isMelee;
-    public bool isRanged;
 
     [Header("Character Base Stats")]
     public float health;
@@ -16,4 +15,9 @@ public class CharacterBaseSO : ScriptableObject
     public float attackRange;
     public float attackRate;
 
+    public void TakeDamage(float damage)
+    {
+        health -= attackDamage;
+        if (health < 0) health = 0;
+    }
 }

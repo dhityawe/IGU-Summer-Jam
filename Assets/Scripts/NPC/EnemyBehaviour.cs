@@ -4,41 +4,91 @@ using UnityEngine;
 
 public class EnemyBehaviour : MonoBehaviour
 {
-    // Reference to the CharacterBaseSO scriptable object
+    public bool isInRange;
+    public LayerMask playerLayer;
     public CharacterBaseSO characterBase;
 
-    // Reference to the player position so it will chase the player
     [HideInInspector] public GameObject player, princess;
+    private RangedAttack rangedAttack;
 
-    
-
-    // Start is called before the first frame update
     void Start()
     {
         player = GameObject.Find("Player");
         princess = GameObject.Find("Princess");
+        rangedAttack = GetComponent<RangedAttack>(); // Get the RangedAttack component
     }
 
-    // Update is called once per frame
     void Update()
     {
         FollowTarget();
+        IsPlayerInRange();
     }
 
     void FollowTarget()
     {
+        Transform target = player.transform;
         float playerTarget = Vector3.Distance(player.transform.position, transform.position);
         float princessTarget = Vector3.Distance(princess.transform.position, transform.position);
 
-        if(playerTarget > princessTarget)
+        if (playerTarget > princessTarget)
         {
-            Vector3 direction = (princess.transform.position - transform.position).normalized;
-            transform.position += direction * characterBase.movementSpeed * Time.deltaTime;
+            target = princess.transform;
         }
         else
         {
-            Vector3 direction = (player.transform.position - transform.position).normalized;
-            transform.position += direction * characterBase.movementSpeed * Time.deltaTime;
+            target = player.transform;
         }
+
+        Vector3 direction = (target.position - transform.position).normalized;
+        transform.position += direction * characterBase.movementSpeed * Time.deltaTime;
+
+        // Set the target for ranged attack
+        if (rangedAttack != null)
+        {
+            rangedAttack.SetTarget(target);
+        }
+    }
+
+    void IsPlayerInRange()
+    {
+        // Get all colliders within the detection radius
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, characterBase.attackRange, playerLayer);
+
+        bool playerInRange = false;
+        Transform target = null;
+
+        foreach (var collider in hitColliders)
+        {
+            if (collider.CompareTag("Player"))
+            {
+                playerInRange = true;
+                target = collider.transform;
+                break; // Exit the loop after finding the player
+            }
+        }
+
+        // Set the target to shoot at
+        if (playerInRange)
+        {
+            if (rangedAttack != null && target != null)
+            {
+                rangedAttack.SetTarget(target);
+                Debug.Log("Player detected within radius! Shooting.");
+            }
+        }
+        else
+        {
+            // Optionally, you can reset the target if not in range
+            if (rangedAttack != null)
+            {
+                rangedAttack.SetTarget(null);
+            }
+        }
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, characterBase.attackRange);
     }
 }
